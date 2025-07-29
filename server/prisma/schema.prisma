@@ -14,18 +14,20 @@ datasource db {
 }
 
 model User {
-  id                  Int               @id @default(autoincrement())
-  email               String            @unique
+  id                  Int       @id @default(autoincrement())
+  email               String    @unique
   password            String
   role                String
-  failedLoginAttempts Int               @default(0)
+  failedLoginAttempts Int       @default(0)
   lockoutUntil        DateTime?
   lastLogin           DateTime?
   previousLogin       DateTime?
   passwordChangedAt   DateTime?
 
-  passwordHistory     PasswordHistory[]
-  auditLogs           AuditLog[]        @relation("UserAuditLogs")
+  passwordHistory PasswordHistory[]
+  auditLogs       AuditLog[]        @relation("UserAuditLogs")
+  createdTasks    Task[]            @relation("CreatedBy")
+  assignedTasks   Task[]            @relation("AssignedTo")
 }
 
 model PasswordHistory {
@@ -45,6 +47,24 @@ model AuditLog {
   timestamp DateTime @default(now())
 
   user User? @relation("UserAuditLogs", fields: [userId], references: [id])
+}
+
+model Task {
+  id          Int    @id @default(autoincrement())
+  title       String
+  description String
+  status      String @default("PENDING")
+
+  // Creator relation
+  createdBy   User @relation("CreatedBy", fields: [createdById], references: [id])
+  createdById Int
+
+  // Assignee relation
+  assignedTo   User? @relation("AssignedTo", fields: [assignedToId], references: [id])
+  assignedToId Int?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 enum Role {
