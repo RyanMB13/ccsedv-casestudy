@@ -26,7 +26,7 @@ function CreateUserForm({ onUserCreated, onCancel }) {
 
   return (
     <div className="bg-white p-4 rounded shadow max-w-md">
-      <h3 className="text-lg font-bold mb-2">Create Admin/Manager User</h3>
+      <h3 className="text-lg font-bold mb-2">➕ Create Admin/Manager User</h3>
       {message && <p className="mb-2 text-blue-700">{message}</p>}
 
       <form onSubmit={handleSubmit} className="space-y-3">
