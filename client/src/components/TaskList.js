@@ -1,4 +1,3 @@
-// src/components/TaskList.js
 import { useEffect, useState } from "react";
 import api from "../services/api";
 import EditTaskModal from "./EditTaskModal";
@@ -65,6 +64,8 @@ function TaskList({ reload }) {
               <th>Status</th>
               <th>Assigned To</th>
               <th>Created By</th>
+              <th>Created At</th>
+              <th>Updated At</th>
               <th>Actions</th>
             </tr>
           </thead>
@@ -77,6 +78,8 @@ function TaskList({ reload }) {
                 <td>{task.status}</td>
                 <td>{task.assignedTo?.email || "Unassigned"}</td>
                 <td>{task.createdBy?.email || "Unknown"}</td>
+                <td>{new Date(task.createdAt).toLocaleString()}</td>
+                <td>{new Date(task.updatedAt).toLocaleString()}</td>
                 <td className="space-x-1">
                   <button
                     className="bg-green-600 text-white px-2 py-1 rounded"
@@ -85,14 +88,12 @@ function TaskList({ reload }) {
                   >
                     Mark as Complete
                   </button>
-                  <space> </space>
                   <button
                     className="bg-yellow-500 text-white px-2 py-1 rounded"
                     onClick={() => setEditingTask(task)}
                   >
                     Edit
                   </button>
-                  <space> </space>
                   <button
                     className="bg-red-600 text-white px-2 py-1 rounded"
                     onClick={() => handleDelete(task.id)}
