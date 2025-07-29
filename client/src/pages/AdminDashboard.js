@@ -1,4 +1,3 @@
-// AdminDashboard.js
 import React, { useEffect, useState } from "react";
 import api from "../services/api";
 import EditUserModal from "../components/EditUserModal";
@@ -8,78 +7,114 @@ function AdminDashboard() {
   const [users, setUsers] = useState([]);
   const [error, setError] = useState("");
   const [editingUser, setEditingUser] = useState(null);
-
-  const fetchAllUsers = async () => {
-    try {
-      const res = await api.get("/admin/users");
-      const userList = Array.isArray(res.data.users) ? res.data.users : [];
-      setUsers(userList);
-    } catch (err) {
-      console.error("Failed to fetch users:", err);
-      setError("Access denied or failed to load users.");
-    }
-  };
+  const [showCreateModal, setShowCreateModal] = useState(false);
 
   useEffect(() => {
+    const fetchAllUsers = async () => {
+      try {
+        const res = await api.get("/admin/users");
+        setUsers(res.data.users);
+      } catch (err) {
+        console.error("Failed to fetch users:", err);
+        setError("Access denied or failed to load users.");
+      }
+    };
+
     fetchAllUsers();
   }, []);
 
+  const handleSave = (updatedUser) => {
+    setUsers((prev) =>
+      prev.map((u) => (u.id === updatedUser.id ? updatedUser : u))
+    );
+    setEditingUser(null);
+  };
+
+  const handleCreate = (newUser) => {
+    setUsers((prev) => [...prev, newUser]);
+    setShowCreateModal(false);
+  };
+
   return (
     <div className="p-6">
-      <h2 className="text-2xl font-bold mb-4">Admin Dashboard</h2>
+      <h2 className="text-3xl font-bold mb-6">👤 Admin Dashboard</h2>
 
-      {error && <p className="text-red-600">{error}</p>}
+      <div className="mb-4 flex justify-start">
+        <button
+          onClick={() => setShowCreateModal(true)}
+          className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition"
+        >
+          + Create User
+        </button>
+      </div>
 
-      {users.length === 0 && !error && <p>No users found.</p>}
-      <CreateUserForm onUserCreated={fetchAllUsers} />
-      <h3>User List</h3>
+      {showCreateModal && (
+        <div className="mb-6">
+          <CreateUserForm onUserCreated={handleCreate} onCancel={() => setShowCreateModal(false)} />
+        </div>
+      )}
+
+      {error && <p className="text-red-600 mb-4">{error}</p>}
+
+      {users.length === 0 && !error && (
+        <p className="text-gray-600">No users found.</p>
+      )}
+
       {users.length > 0 && (
-        <table className="w-full border border-collapse mt-4" border="1" cellPadding="6">
-          <thead>
-            <tr className="bg-gray-200">
-              <th>ID</th>
-              <th>Email</th>
-              <th>Role</th>
-              <th>Last Login</th>
-              <th>Previous Login</th>
-              <th>Lockout Until</th>
-              <th>Failed Attempts</th>
-              <th>Password Changed At</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {users
-              .filter((u) => u && typeof u.id !== "undefined")
-              .map((u) => (
-                <tr key={u.id}>
-                  <td>{u.id}</td>
-                  <td>{u.email}</td>
-                  <td>{u.role}</td>
-                  <td>{u.lastLogin ? new Date(u.lastLogin).toLocaleString() : "N/A"}</td>
-                  <td>{u.previousLogin ? new Date(u.previousLogin).toLocaleString() : "N/A"}</td>
-                  <td>{u.lockoutUntil ? new Date(u.lockoutUntil).toLocaleString() : "N/A"}</td>
-                  <td>{u.failedLoginAttempts}</td>
-                  <td>{u.passwordChangedAt ? new Date(u.passwordChangedAt).toLocaleString() : "N/A"}</td>
-                  <td>
+        <div className="bg-white shadow rounded-lg p-4 overflow-x-auto">
+          <table className="min-w-full table-auto text-sm text-left">
+            <thead className="bg-gray-100 text-gray-700">
+              <tr>
+                <th className="px-4 py-2">ID</th>
+                <th className="px-4 py-2">Email</th>
+                <th className="px-4 py-2">Role</th>
+                <th className="px-4 py-2">Last Login</th>
+                <th className="px-4 py-2">Previous Login</th>
+                <th className="px-4 py-2">Lockout</th>
+                <th className="px-4 py-2">Failed</th>
+                <th className="px-4 py-2">Password Changed</th>
+                <th className="px-4 py-2">Actions</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-gray-200">
+              {users.map((u) => (
+                <tr key={u.id} className="hover:bg-gray-50 transition">
+                  <td className="px-4 py-2">{u.id}</td>
+                  <td className="px-4 py-2">{u.email}</td>
+                  <td className="px-4 py-2">{u.role}</td>
+                  <td className="px-4 py-2">
+                    {u.lastLogin ? new Date(u.lastLogin).toLocaleString() : "—"}
+                  </td>
+                  <td className="px-4 py-2">
+                    {u.previousLogin ? new Date(u.previousLogin).toLocaleString() : "—"}
+                  </td>
+                  <td className="px-4 py-2">
+                    {u.lockoutUntil ? new Date(u.lockoutUntil).toLocaleString() : "—"}
+                  </td>
+                  <td className="px-4 py-2">{u.failedLoginAttempts}</td>
+                  <td className="px-4 py-2">
+                    {u.passwordChangedAt ? new Date(u.passwordChangedAt).toLocaleString() : "—"}
+                  </td>
+                  <td className="px-4 py-2">
                     <button
-                      className="bg-yellow-500 text-white px-2 py-1 rounded"
                       onClick={() => setEditingUser(u)}
+                      className="px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-700 transition"
                     >
                       Edit
                     </button>
                   </td>
                 </tr>
               ))}
-          </tbody>
-        </table>
+            </tbody>
+          </table>
+        </div>
       )}
 
       {editingUser && (
         <EditUserModal
           user={editingUser}
           onClose={() => setEditingUser(null)}
-          onRefresh={fetchAllUsers}
+          onSave={handleSave}
         />
       )}
     </div>

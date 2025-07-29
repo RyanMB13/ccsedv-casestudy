@@ -1,8 +1,7 @@
-// components/CreateUserForm.js
 import React, { useState } from "react";
 import api from "../services/api";
 
-function CreateUserForm({ onUserCreated }) {
+function CreateUserForm({ onUserCreated, onCancel }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [role, setRole] = useState("MANAGER");
@@ -29,6 +28,7 @@ function CreateUserForm({ onUserCreated }) {
     <div className="bg-white p-4 rounded shadow max-w-md">
       <h3 className="text-lg font-bold mb-2">Create Admin/Manager User</h3>
       {message && <p className="mb-2 text-blue-700">{message}</p>}
+
       <form onSubmit={handleSubmit} className="space-y-3">
         <input
           type="email"
@@ -54,9 +54,22 @@ function CreateUserForm({ onUserCreated }) {
           <option value="MANAGER">MANAGER</option>
           <option value="ADMIN">ADMIN</option>
         </select>
-        <button type="submit" className="bg-blue-600 text-white px-4 py-2 rounded">
-          Create User
-        </button>
+
+        <div className="flex justify-between">
+          <button
+            type="submit"
+            className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+          >
+            Create User
+          </button>
+          <button
+            type="button"
+            onClick={onCancel}
+            className="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700"
+          >
+            Cancel
+          </button>
+        </div>
       </form>
     </div>
   );

@@ -1,4 +1,3 @@
-// EditUserModal.js
 import React, { useState } from "react";
 import api from "../services/api";
 
@@ -15,7 +14,7 @@ function EditUserModal({ user, onClose, onRefresh }) {
         newRole: role,
       });
       onRefresh();
-      onClose();  
+      onClose();
     } catch (err) {
       console.error("Failed to update user:", err);
       alert("Failed to update user role.");
@@ -51,7 +50,7 @@ function EditUserModal({ user, onClose, onRefresh }) {
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2 bg-gray-500 text-white rounded"
+              className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 transition"
               disabled={loading}
             >
               Cancel
