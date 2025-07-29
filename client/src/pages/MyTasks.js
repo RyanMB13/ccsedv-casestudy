@@ -24,8 +24,8 @@ function MyTasks() {
 
   const handleMarkComplete = async (taskId) => {
     try {
-      await api.put(`/tasks/${taskId}`, { status: "COMPLETED" });
-      refreshTasks(); // Refresh list after update
+      await api.put(`/tasks/tasks/${taskId}`, { status: "COMPLETED" });
+      refreshTasks();
     } catch (err) {
       console.error("Failed to mark task as complete:", err);
       alert("Failed to update task status.");
@@ -33,39 +33,56 @@ function MyTasks() {
   };
 
   return (
-    <div>
-      <h2>My Tasks</h2>
-      {error && <p style={{ color: "red" }}>{error}</p>}
-      {!error && tasks.length === 0 && <p>No tasks assigned to you yet.</p>}
+    <div className="p-6">
+      <h2 className="text-2xl font-bold mb-6">🗒️ My Tasks</h2>
+
+      {error && <p className="text-red-600 font-semibold mb-4">{error}</p>}
+      {!error && tasks.length === 0 && (
+        <p className="text-gray-600">No tasks assigned to you yet.</p>
+      )}
+
       {tasks.length > 0 && (
-        <table border="1" cellPadding="6">
-          <thead>
-            <tr>
-              <th>Title</th>
-              <th>Description</th>
-              <th>Status</th>
-              <th>Action</th>
-            </tr>
-          </thead>
-          <tbody>
-            {tasks.map((task) => (
-              <tr key={task.id}>
-                <td>{task.title}</td>
-                <td>{task.description}</td>
-                <td>{task.status}</td>
-                <td>
-                  {task.status !== "COMPLETED" ? (
-                    <button onClick={() => handleMarkComplete(task.id)}>
-                      Mark as Complete
-                    </button>
-                  ) : (
-                    "✔ Done"
-                  )}
-                </td>
+        <div className="bg-white shadow rounded-lg overflow-x-auto">
+          <table className="min-w-full table-auto text-sm text-left">
+            <thead className="bg-gray-100 text-gray-700">
+              <tr>
+                <th className="px-4 py-2">Title</th>
+                <th className="px-4 py-2">Description</th>
+                <th className="px-4 py-2">Status</th>
+                <th className="px-4 py-2">Action</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody className="divide-y divide-gray-200">
+              {tasks.map((task) => (
+                <tr key={task.id} className="hover:bg-gray-50 transition">
+                  <td className="px-4 py-2 font-medium text-gray-900">
+                    {task.title}
+                  </td>
+                  <td className="px-4 py-2 text-gray-700">{task.description}</td>
+                  <td className="px-4 py-2">
+                    {task.status === "COMPLETED" ? (
+                      <span className="text-green-600 font-semibold">✔ Completed</span>
+                    ) : (
+                      <span className="text-yellow-600 font-medium">⏳ In Progress</span>
+                    )}
+                  </td>
+                  <td className="px-4 py-2">
+                    {task.status !== "COMPLETED" ? (
+                      <button
+                        onClick={() => handleMarkComplete(task.id)}
+                        className="px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-700 transition"
+                      >
+                        Mark as Complete
+                      </button>
+                    ) : (
+                      <span className="text-gray-500">—</span>
+                    )}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       )}
     </div>
   );
