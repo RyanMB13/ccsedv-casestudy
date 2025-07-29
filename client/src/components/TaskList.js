@@ -5,6 +5,7 @@ import EditTaskModal from "./EditTaskModal";
 function TaskList({ reload }) {
   const [tasks, setTasks] = useState([]);
   const [editingTask, setEditingTask] = useState(null);
+  const [taskToDelete, setTaskToDelete] = useState(null);
 
   useEffect(() => {
     async function fetchTasks() {
@@ -32,11 +33,11 @@ function TaskList({ reload }) {
     }
   };
 
-  const handleDelete = async (id) => {
-    if (!window.confirm("Delete this task?")) return;
+  const confirmDelete = async () => {
     try {
-      await api.delete(`/tasks/tasks/${id}`);
-      setTasks((prev) => prev.filter((task) => task.id !== id));
+      await api.delete(`/tasks/tasks/${taskToDelete.id}`);
+      setTasks((prev) => prev.filter((task) => task.id !== taskToDelete.id));
+      setTaskToDelete(null);
     } catch (err) {
       console.error("Delete failed:", err);
     }
@@ -96,7 +97,7 @@ function TaskList({ reload }) {
                   </button>
                   <button
                     className="bg-red-600 text-white px-2 py-1 rounded"
-                    onClick={() => handleDelete(task.id)}
+                    onClick={() => setTaskToDelete(task)}
                   >
                     Delete
                   </button>
@@ -113,6 +114,33 @@ function TaskList({ reload }) {
           onClose={() => setEditingTask(null)}
           onSave={handleSaveEdit}
         />
+      )}
+
+      {/* Custom delete confirmation modal */}
+      {taskToDelete && (
+        <div className="fixed inset-0 bg-black bg-opacity-30 flex justify-center items-center z-50">
+          <div className="bg-white p-6 rounded shadow-lg max-w-sm w-full">
+            <h3 className="text-lg font-semibold mb-4">Confirm Deletion</h3>
+            <p className="mb-4">
+              Are you sure you want to delete the task "
+              <strong>{taskToDelete.title}</strong>"?
+            </p>
+            <div className="flex justify-end space-x-2">
+              <button
+                onClick={() => setTaskToDelete(null)}
+                className="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={confirmDelete}
+                className="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700"
+              >
+                Delete
+              </button>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );
