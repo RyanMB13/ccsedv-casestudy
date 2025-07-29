@@ -32,7 +32,7 @@ function EditTaskModal({ task, onClose, onSave }) {
   return (
     <div className="fixed inset-0 bg-black bg-opacity-30 flex items-center justify-center z-50">
       <div className="bg-white p-6 rounded shadow w-full max-w-md">
-        <h3 className="text-xl font-bold mb-4">Edit Task</h3>
+        <h3 className="text-xl font-bold mb-4">✏️ Edit Task</h3>
         <form onSubmit={handleSubmit}>
           <div className="mb-3">
             <label className="block text-sm font-semibold">Title: </label>

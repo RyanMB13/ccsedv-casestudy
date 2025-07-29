@@ -52,7 +52,7 @@ function TaskForm({ onTaskCreated }) {
       onSubmit={handleSubmit}
       className="space-y-4 p-4 border rounded bg-white shadow"
     >
-      <h3 className="text-lg font-semibold">Create Task</h3>
+      <h3 className="text-lg font-semibold"> Create Task</h3>
 
       {error && <p className="text-red-500">{error}</p>}
 
