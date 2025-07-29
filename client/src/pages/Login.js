@@ -35,7 +35,7 @@ function Login() {
 
       toast.success("Login successful!");
 
-      const userRole = res.data.role;
+    
       setTimeout(() => {
         navigate("/");
       }, 1500);
