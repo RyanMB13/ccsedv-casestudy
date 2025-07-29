@@ -1,4 +1,3 @@
-// src/pages/Register.js
 import React, { useState } from "react";
 import api from "../services/api";
 import { useNavigate } from "react-router-dom";
@@ -13,7 +12,6 @@ function Register() {
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [role, setRole] = useState("CUSTOMER");
 
   const [errors, setErrors] = useState({});
   const [serverError, setServerError] = useState("");
@@ -43,7 +41,11 @@ function Register() {
     if (!validate()) return;
 
     try {
-      await api.post("/register", { email, password, role });
+      await api.post("/register", {
+        email,
+        password,
+        role: "EMPLOYEE", // Force default role
+      });
       alert("Registration successful");
       navigate("/login");
     } catch (err) {
@@ -52,10 +54,10 @@ function Register() {
   };
 
   return (
-    <form onSubmit={handleRegister}>
-      <h2>Register</h2>
+    <form onSubmit={handleRegister} className="max-w-md mx-auto p-6 bg-white rounded shadow space-y-4">
+      <h2 className="text-2xl font-bold">Register</h2>
 
-      {serverError && <p style={{ color: "red" }}>{serverError}</p>}
+      {serverError && <p className="text-red-500">{serverError}</p>}
 
       <div>
         <label>Email:</label>
@@ -64,8 +66,9 @@ function Register() {
           required
           value={email}
           onChange={(e) => setEmail(e.target.value)}
+          className="w-full border p-2 rounded"
         />
-        {errors.email && <p style={{ color: "red" }}>{errors.email}</p>}
+        {errors.email && <p className="text-red-500">{errors.email}</p>}
       </div>
 
       <div>
@@ -75,20 +78,14 @@ function Register() {
           required
           value={password}
           onChange={(e) => setPassword(e.target.value)}
+          className="w-full border p-2 rounded"
         />
-        {errors.password && <p style={{ color: "red" }}>{errors.password}</p>}
+        {errors.password && <p className="text-red-500">{errors.password}</p>}
       </div>
 
-      <div>
-        <label>Role:</label>
-        <select value={role} onChange={(e) => setRole(e.target.value)}>
-          <option value="ADMIN">Admin</option>
-          <option value="MANAGER">Manager</option>
-          <option value="CUSTOMER">Customer</option>
-        </select>
-      </div>
-
-      <button type="submit">Register</button>
+      <button type="submit" className="bg-blue-500 text-white px-4 py-2 rounded">
+        Register
+      </button>
     </form>
   );
 }

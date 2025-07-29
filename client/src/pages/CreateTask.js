@@ -13,7 +13,7 @@ function CreateTask() {
   useEffect(() => {
     const fetchUsers = async () => {
       try {
-        const res = await api.get("/users/customers");
+        const res = await api.get("/users/employees");
         setUsers(res.data);
       } catch (err) {
         console.error("Error fetching users:", err);

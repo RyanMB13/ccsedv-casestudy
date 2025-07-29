@@ -11,7 +11,7 @@ router.get("/", verifyToken, async (req, res) => {
     const users = await prisma.user.findMany({
       select: { id: true, email: true, role: true },
       where: {
-        role: "CUSTOMER",
+        role: "EMPLOYEE",
       },
     });
     res.json(users);

@@ -17,10 +17,10 @@ router.post("/tasks", requireRole(["MANAGER", "ADMIN"]), taskController.createTa
 // Get all tasks (Manager/Admin only)
 router.get("/tasks", requireRole(["MANAGER", "ADMIN"]), taskController.getAllTasks);
 
-// Get tasks assigned to self (Customer only)
-router.get("/my-tasks", requireRole(["CUSTOMER"]), taskController.getMyTasks);
+// Get tasks assigned to self (Employee only)
+router.get("/my-tasks", requireRole(["EMPLOYEE"]), taskController.getMyTasks);
 
-// Update task (Manager/Admin only — extend later if CUSTOMER can update own tasks)
+// Update task (Manager/Admin only — extend later if Employee can update own tasks)
 router.put("/tasks/:id", requireRole(["MANAGER", "ADMIN"]), taskController.updateTask);
 
 // Delete task (Manager/Admin only)

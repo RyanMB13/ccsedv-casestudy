@@ -11,7 +11,7 @@ const JWT_SECRET = process.env.JWT_SECRET || "supersecret";
 // POST /api/register
 // ===============================
 exports.registerUser = async (req, res) => {
-  const { email, password, role } = req.body;
+  const { email, password } = req.body;
 
   try {
     if (!isValidEmail(email)) {
@@ -38,11 +38,8 @@ exports.registerUser = async (req, res) => {
       });
     }
 
-    const allowedRoles = ["ADMIN", "MANAGER", "CUSTOMER"];
-    if (!allowedRoles.includes(role)) {
-      await logAudit({ action: "VALIDATION_FAIL_REGISTER_ROLE", req });
-      return res.status(400).json({ message: "Invalid role specified." });
-    }
+    // Enforce default role
+    const role = "EMPLOYEE";
 
     const hashedPassword = await bcrypt.hash(password, await bcrypt.genSalt(10));
 

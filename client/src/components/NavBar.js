@@ -31,7 +31,7 @@ function Navbar() {
             <Link to="/manager-dashboard" style={{ marginRight: "10px" }}>Manager Dashboard</Link>
           )}
 
-          {role === "CUSTOMER" && (
+          {role === "EMPLOYEE" && (
             <Link to="/my-tasks" style={{ marginRight: "10px" }}>My Tasks</Link>
           )}
 

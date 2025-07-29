@@ -17,9 +17,9 @@ async function main() {
       role: 'MANAGER',
     },
     {
-      email: 'customer@customer.com',
-      password: 'Customer123!',
-      role: 'CUSTOMER',
+      email: 'employee@employee.com',
+      password: 'Employee123!',
+      role: 'EMPLOYEE',
     },
   ];
 
@@ -41,7 +41,7 @@ async function main() {
     });
   }
 
-  console.log('Seeded users: admin, manager, customer');
+  console.log('Seeded users: admin, manager, employee');
 }
 
 main()

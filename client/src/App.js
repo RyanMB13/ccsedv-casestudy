@@ -28,7 +28,7 @@ function App() {
         <Route
           path="/profile"
           element={
-            <ProtectedRoute allowedRoles={["ADMIN", "MANAGER", "CUSTOMER"]}>
+            <ProtectedRoute allowedRoles={["ADMIN", "MANAGER", "EMPLOYEE"]}>
               <Profile />
             </ProtectedRoute>
           }
@@ -55,7 +55,7 @@ function App() {
         <Route
           path="/change-password"
           element={
-            <ProtectedRoute allowedRoles={["ADMIN", "MANAGER", "CUSTOMER"]}>
+            <ProtectedRoute allowedRoles={["ADMIN", "MANAGER", "EMPLOYEE"]}>
               <ChangePassword />
             </ProtectedRoute>
           }
@@ -91,7 +91,7 @@ function App() {
         <Route
           path="/my-tasks"
           element={
-            <ProtectedRoute allowedRoles={["CUSTOMER"]}>
+            <ProtectedRoute allowedRoles={["EMPLOYEE"]}>
               <MyTasks />
             </ProtectedRoute>
           }

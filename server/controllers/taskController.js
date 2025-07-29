@@ -55,7 +55,7 @@ exports.getAllTasks = async (req, res) => {
   }
 };
 
-// GET own assigned tasks (customer)
+// GET own assigned tasks (employee)
 exports.getMyTasks = async (req, res) => {
   const userId = req.user.userId;
 

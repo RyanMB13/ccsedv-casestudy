@@ -70,5 +70,5 @@ model Task {
 enum Role {
   ADMIN
   MANAGER
-  CUSTOMER
+  EMPLOYEE
 }
