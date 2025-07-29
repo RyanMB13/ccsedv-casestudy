@@ -1,10 +1,8 @@
-// src/components/Navbar.js
 import React from "react";
 import { Link, useNavigate } from "react-router-dom";
 
 function Navbar() {
   const navigate = useNavigate();
-
   const token = localStorage.getItem("token");
   const role = localStorage.getItem("role");
 
@@ -15,37 +13,70 @@ function Navbar() {
   };
 
   return (
-    <nav style={{ padding: "10px", borderBottom: "1px solid #ccc" }}>
-      {token ? (
-        <>
-          <Link to="/profile" style={{ marginRight: "10px" }}>Profile</Link>
+    <nav className="bg-gray-800 text-white px-6 py-3 shadow">
+      <div className="flex items-center justify-between">
+        <div className="flex space-x-4">
+          <Link to="/" className="text-xl font-bold hover:text-gray-300">
+            HackermanApp
+          </Link>
 
-          {role === "ADMIN" && (
+          {token && (
             <>
-              <Link to="/admin-dashboard" style={{ marginRight: "10px" }}>Admin Dashboard</Link>
-              <Link to="/audit-logs" style={{ marginRight: "10px" }}>Audit Logs</Link>
+              <Link to="/profile" className="hover:text-gray-300">
+                Profile
+              </Link>
+
+              {role === "ADMIN" && (
+                <>
+                  <Link to="/admin-dashboard" className="hover:text-gray-300">
+                    Admin Dashboard
+                  </Link>
+                  <Link to="/audit-logs" className="hover:text-gray-300">
+                    Audit Logs
+                  </Link>
+                </>
+              )}
+
+              {(role === "MANAGER" || role === "ADMIN") && (
+                <Link to="/manager-dashboard" className="hover:text-gray-300">
+                  Manager Dashboard
+                </Link>
+              )}
+
+              {role === "EMPLOYEE" && (
+                <>
+                  <Link to="/employee/create-task" className="hover:text-gray-300">
+                    Create Task
+                  </Link>
+                  <Link to="/my-tasks" className="hover:text-gray-300">
+                    My Tasks
+                  </Link>
+                </>
+              )}
             </>
           )}
 
-          {(role === "MANAGER" || role === "ADMIN") && (
-            <Link to="/manager-dashboard" style={{ marginRight: "10px" }}>Manager Dashboard</Link>
-          )}
-
-          {role === "EMPLOYEE" && (
+          {!token && (
             <>
-              <Link to="/employee/create-task" style={{ marginRight: "10px" }}>Create Task</Link>
-              <Link to="/my-tasks" style={{ marginRight: "10px" }}>My Tasks</Link>
+              <Link to="/login" className="hover:text-gray-300">
+                Login
+              </Link>
+              <Link to="/register" className="hover:text-gray-300">
+                Register
+              </Link>
             </>
           )}
+        </div>
 
-          <button onClick={handleLogout}>Logout</button>
-        </>
-      ) : (
-        <>
-          <Link to="/login" style={{ marginRight: "10px" }}>Login</Link>
-          <Link to="/register">Register</Link>
-        </>
-      )}
+        {token && (
+          <button
+            onClick={handleLogout}
+            className="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded"
+          >
+            Logout
+          </button>
+        )}
+      </div>
     </nav>
   );
 }

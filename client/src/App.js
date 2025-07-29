@@ -13,14 +13,22 @@ import TaskForm from "./components/TaskForm";
 import EmployeeCreateTask from "./pages/EmployeeCreateTask";
 import ForgotPassword from "./pages/ForgotPassword";
 import ResetPassword from "./pages/ResetPassword";
+import Home from "./pages/Home";
 
 import ProtectedRoute from "./components/ProtectedRoute";
 import Navbar from "./components/NavBar";
+
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 function App() {
   return (
     <Router>
       <Navbar />
+
+      {/* Toast container must be placed here to apply globally */}
+      <ToastContainer position="top-center" autoClose={3000} />
+
       <Routes>
         {/* Public Routes */}
         <Route path="/login" element={<Login />} />
@@ -29,6 +37,13 @@ function App() {
         <Route path="/reset-password/:token" element={<ResetPassword />} />
 
         {/* Authenticated Routes */}
+        <Route path="/"
+          element={
+            <ProtectedRoute allowedRoles={["ADMIN", "MANAGER", "EMPLOYEE"]}>
+              <Home />
+            </ProtectedRoute>
+          }
+        />
         <Route
           path="/profile"
           element={

@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import api from "../services/api";
 import { useNavigate, Link } from "react-router-dom";
 import { isValidEmail, isReasonablePasswordLength } from "../utils/validationHelpers";
+import { toast } from "react-toastify";
 
 function Login() {
   const navigate = useNavigate();
@@ -32,16 +33,12 @@ function Login() {
       localStorage.setItem("token", res.data.token);
       localStorage.setItem("role", res.data.role);
 
-      alert("Login successful");
+      toast.success("Login successful!");
 
       const userRole = res.data.role;
-      if (userRole === "ADMIN") {
-        navigate("/admin-dashboard");
-      } else if (userRole === "MANAGER") {
-        navigate("/manager-dashboard");
-      } else {
-        navigate("/profile");
-      }
+      setTimeout(() => {
+        navigate("/");
+      }, 1500);
     } catch (err) {
       setError(err.response?.data?.message || "Login failed");
     }
