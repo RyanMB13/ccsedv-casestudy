@@ -10,7 +10,7 @@ function TaskList({ reload }) {
   useEffect(() => {
     async function fetchTasks() {
       try {
-        const res = await api.get("/tasks");
+        const res = await api.get("/tasks/tasks");
         setTasks(res.data);
       } catch (err) {
         console.error("Error fetching tasks:", err);
@@ -22,7 +22,7 @@ function TaskList({ reload }) {
 
   const handleMarkComplete = async (id) => {
     try {
-      await api.put(`/tasks/${id}`, { status: "COMPLETED" });
+      await api.put(`/tasks/tasks/${id}`, { status: "COMPLETED" });
       setTasks((prev) =>
         prev.map((task) =>
           task.id === id ? { ...task, status: "COMPLETED" } : task
@@ -36,7 +36,7 @@ function TaskList({ reload }) {
   const handleDelete = async (id) => {
     if (!window.confirm("Delete this task?")) return;
     try {
-      await api.delete(`/tasks/${id}`);
+      await api.delete(`/tasks/tasks/${id}`);
       setTasks((prev) => prev.filter((task) => task.id !== id));
     } catch (err) {
       console.error("Delete failed:", err);

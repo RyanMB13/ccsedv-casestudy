@@ -30,7 +30,7 @@ function TaskForm({ onTaskCreated }) {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await api.post("/tasks", {
+      await api.post("/tasks/tasks", {
       title,
       description,
       ...(role !== "EMPLOYEE" && assignedToId ? { assignedToId } : {}),

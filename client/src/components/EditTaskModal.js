@@ -16,7 +16,7 @@ function EditTaskModal({ task, onClose, onSave }) {
     e.preventDefault();
 
     try {
-      const res = await api.put(`/tasks/${task.id}`, {
+      const res = await api.put(`/tasks/tasks/${task.id}`, {
         title,
         description,
         status,

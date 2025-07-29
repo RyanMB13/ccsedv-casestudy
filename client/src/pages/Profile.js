@@ -25,22 +25,40 @@ function Profile() {
   };
 
   return (
-    <div>
-      <h2>Profile</h2>
+    <div className="p-6">
+      <h2 className="text-2xl font-bold mb-4">Profile</h2>
 
-      {error && <p style={{ color: "red" }}>{error}</p>}
+      {error && <p className="text-red-600">{error}</p>}
 
       {user ? (
         <div>
-          <p><strong>Email:</strong> {user.email}</p>
-          <p><strong>Role:</strong> {user.role}</p>
-          {user.lastLogin && (
-            <p><strong>Last Login:</strong> {new Date(user.lastLogin).toLocaleString()}</p>
-          )}
-          {user.previousLogin && (
-            <p><strong>Previous Login:</strong> {new Date(user.previousLogin).toLocaleString()}</p>
-          )}
-          <button onClick={handleChangePassword}>Change Password</button>
+          <table className="w-full border border-collapse mb-4" border="1" cellPadding="6">
+            <thead>
+              <tr className="bg-gray-200">
+                <th>Email</th>
+                <th>Role</th>
+                <th>Last Login</th>
+                <th>Previous Login</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>{user.email}</td>
+                <td>{user.role}</td>
+                <td>{user.lastLogin ? new Date(user.lastLogin).toLocaleString() : "N/A"}</td>
+                <td>{user.previousLogin ? new Date(user.previousLogin).toLocaleString() : "N/A"}</td>
+                <td>
+                  <button
+                    onClick={handleChangePassword}
+                    className="px-3 py-1 bg-blue-600 text-white rounded"
+                  >
+                    Change Password
+                  </button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
         </div>
       ) : (
         !error && <p>Loading...</p>

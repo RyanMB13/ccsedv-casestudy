@@ -11,7 +11,7 @@ function EmployeeCreateTask() {
     e.preventDefault();
 
     try {
-      await api.post("/tasks", {
+      await api.post("/tasks/tasks", {
         title,
         description,
       });

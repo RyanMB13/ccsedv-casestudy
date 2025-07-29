@@ -8,7 +8,7 @@ function MyTasks() {
 
   const fetchMyTasks = async () => {
     try {
-      const res = await api.get("/my-tasks");
+      const res = await api.get("/tasks/my-tasks");
       setTasks(res.data);
     } catch (err) {
       console.error("Failed to fetch your tasks:", err);
