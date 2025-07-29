@@ -36,7 +36,7 @@ function Login() {
 
       const userRole = res.data.role;
       if (userRole === "ADMIN") {
-        navigate("/admin-only");
+        navigate("/admin-dashboard");
       } else if (userRole === "MANAGER") {
         navigate("/manager-dashboard");
       } else {

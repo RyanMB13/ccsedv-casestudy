@@ -46,21 +46,26 @@ exports.updateUserRole = async (req, res) => {
     return res.status(400).json({ message: "Invalid role." });
   }
 
-  const updated = await prisma.user.update({
-    where: { id: Number(id) },
-    data: { role: newRole },
-  });
+  try {
+    const updated = await prisma.user.update({
+      where: { id: Number(id) },
+      data: { role: newRole },
+    });
 
-  await logAudit({
-    userId: req.user.userId,
-    action: "UPDATE_USER_ROLE",
-    req,
-    metadata: {
-      updatedUserId: updated.id,
-      updatedUserEmail: updated.email,
-      newRole,
-    },
-  });
+    await logAudit({
+      userId: req.user.userId,
+      action: "UPDATE_USER_ROLE",
+      req,
+      metadata: {
+        updatedUserId: updated.id,
+        updatedUserEmail: updated.email,
+        newRole,
+      },
+    });
 
-  res.json({ message: "Role updated", user: updated });
+    res.json({ message: "Role updated", updatedUser: updated });
+  } catch (err) {
+    console.error("Failed to update user role:", err);
+    res.status(500).json({ message: "Server error while updating role." });
+  }
 };

@@ -1,3 +1,4 @@
+// AdminDashboard.js
 import React, { useEffect, useState } from "react";
 import api from "../services/api";
 import EditUserModal from "../components/EditUserModal";
@@ -7,30 +8,25 @@ function AdminDashboard() {
   const [error, setError] = useState("");
   const [editingUser, setEditingUser] = useState(null);
 
-  useEffect(() => {
-    const fetchAllUsers = async () => {
-      try {
-        const res = await api.get("/admin/users");
-        setUsers(res.data.users);
-      } catch (err) {
-        console.error("Failed to fetch users:", err);
-        setError("Access denied or failed to load users.");
-      }
-    };
+  const fetchAllUsers = async () => {
+    try {
+      const res = await api.get("/admin/users");
+      const userList = Array.isArray(res.data.users) ? res.data.users : [];
+      setUsers(userList);
+    } catch (err) {
+      console.error("Failed to fetch users:", err);
+      setError("Access denied or failed to load users.");
+    }
+  };
 
+  useEffect(() => {
     fetchAllUsers();
   }, []);
-
-  const handleSave = (updatedUser) => {
-    setUsers((prev) =>
-      prev.map((u) => (u.id === updatedUser.id ? updatedUser : u))
-    );
-    setEditingUser(null);
-  };
 
   return (
     <div className="p-6">
       <h2 className="text-2xl font-bold mb-4">Admin: All Users</h2>
+
       {error && <p className="text-red-600">{error}</p>}
 
       {users.length === 0 && !error && <p>No users found.</p>}
@@ -51,26 +47,28 @@ function AdminDashboard() {
             </tr>
           </thead>
           <tbody>
-            {users.map((u) => (
-              <tr key={u.id}>
-                <td>{u.id}</td>
-                <td>{u.email}</td>
-                <td>{u.role}</td>
-                <td>{u.lastLogin ? new Date(u.lastLogin).toLocaleString() : "N/A"}</td>
-                <td>{u.previousLogin ? new Date(u.previousLogin).toLocaleString() : "N/A"}</td>
-                <td>{u.lockoutUntil ? new Date(u.lockoutUntil).toLocaleString() : "N/A"}</td>
-                <td>{u.failedLoginAttempts}</td>
-                <td>{u.passwordChangedAt ? new Date(u.passwordChangedAt).toLocaleString() : "N/A"}</td>
-                <td>
-                  <button
-                    className="bg-yellow-500 text-white px-2 py-1 rounded"
-                    onClick={() => setEditingUser(u)}
-                  >
-                    Edit
-                  </button>
-                </td>
-              </tr>
-            ))}
+            {users
+              .filter((u) => u && typeof u.id !== "undefined")
+              .map((u) => (
+                <tr key={u.id}>
+                  <td>{u.id}</td>
+                  <td>{u.email}</td>
+                  <td>{u.role}</td>
+                  <td>{u.lastLogin ? new Date(u.lastLogin).toLocaleString() : "N/A"}</td>
+                  <td>{u.previousLogin ? new Date(u.previousLogin).toLocaleString() : "N/A"}</td>
+                  <td>{u.lockoutUntil ? new Date(u.lockoutUntil).toLocaleString() : "N/A"}</td>
+                  <td>{u.failedLoginAttempts}</td>
+                  <td>{u.passwordChangedAt ? new Date(u.passwordChangedAt).toLocaleString() : "N/A"}</td>
+                  <td>
+                    <button
+                      className="bg-yellow-500 text-white px-2 py-1 rounded"
+                      onClick={() => setEditingUser(u)}
+                    >
+                      Edit
+                    </button>
+                  </td>
+                </tr>
+              ))}
           </tbody>
         </table>
       )}
@@ -79,7 +77,7 @@ function AdminDashboard() {
         <EditUserModal
           user={editingUser}
           onClose={() => setEditingUser(null)}
-          onSave={handleSave}
+          onRefresh={fetchAllUsers} // pass refresh function
         />
       )}
     </div>
