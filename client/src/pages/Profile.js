@@ -26,32 +26,36 @@ function Profile() {
 
   return (
     <div className="p-6">
-      <h2 className="text-2xl font-bold mb-4">Profile</h2>
+      <h2 className="text-3xl font-bold mb-6">👤 Profile</h2>
 
       {error && <p className="text-red-600">{error}</p>}
 
       {user ? (
         <div>
-          <table className="w-full border border-collapse mb-4" border="1" cellPadding="6">
+          <table className="w-full border border-collapse mb-4 text-center" border="1" cellPadding="6">
             <thead>
               <tr className="bg-gray-200">
-                <th>Email</th>
-                <th>Role</th>
-                <th>Last Login</th>
-                <th>Previous Login</th>
-                <th>Actions</th>
+                <th className="px-4 py-2">Email</th>
+                <th className="px-4 py-2">Role</th>
+                <th className="px-4 py-2">Last Login</th>
+                <th className="px-4 py-2">Previous Login</th>
+                <th className="px-4 py-2">Actions</th>
               </tr>
             </thead>
             <tbody>
               <tr>
-                <td>{user.email}</td>
-                <td>{user.role}</td>
-                <td>{user.lastLogin ? new Date(user.lastLogin).toLocaleString() : "N/A"}</td>
-                <td>{user.previousLogin ? new Date(user.previousLogin).toLocaleString() : "N/A"}</td>
-                <td>
+                <td className="px-4 py-2">{user.email}</td>
+                <td className="px-4 py-2">{user.role}</td>
+                <td className="px-4 py-2">
+                  {user.lastLogin ? new Date(user.lastLogin).toLocaleString() : "N/A"}
+                </td>
+                <td className="px-4 py-2">
+                  {user.previousLogin ? new Date(user.previousLogin).toLocaleString() : "N/A"}
+                </td>
+                <td className="px-4 py-2">
                   <button
                     onClick={handleChangePassword}
-                    className="px-3 py-1 bg-blue-600 text-white rounded"
+                    className="px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-700 transition"
                   >
                     Change Password
                   </button>
