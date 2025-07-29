@@ -1,26 +1,18 @@
-import React, { useEffect, useState } from "react";
-import api from "../services/api";
+// src/pages/ManagerDashboard.js
+import { useState } from "react";
+import TaskForm from "../components/TaskForm";
+import TaskList from "../components/TaskList";
 
 function ManagerDashboard() {
-  const [message, setMessage] = useState("");
-  const [error, setError] = useState("");
+  const [reload, setReload] = useState(false);
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const res = await api.get("/manager-dashboard");
-        setMessage(res.data.message);
-      } catch (err) {
-        setError("Access denied: Managers or Admins only.");
-      }
-    };
-    fetchData();
-  }, []);
+  const refreshTasks = () => setReload((prev) => !prev);
 
   return (
-    <div>
-      <h2>Manager Dashboard</h2>
-      {error ? <p style={{ color: "red" }}>{error}</p> : <p>{message}</p>}
+    <div className="p-6">
+      <h2 className="text-2xl font-bold mb-4">Manager Dashboard</h2>
+      <TaskForm onTaskCreated={refreshTasks} />
+      <TaskList reload={reload} />
     </div>
   );
 }

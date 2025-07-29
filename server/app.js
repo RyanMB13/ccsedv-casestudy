@@ -1,3 +1,4 @@
+//server/app.js
 const express = require("express");
 const cors = require("cors");
 const helmet = require("helmet");
@@ -10,6 +11,7 @@ const authRoutes = require("./routes/auth");
 const protectedRoutes = require("./routes/protected");
 const adminRoutes = require("./routes/adminRoutes");
 const taskRoutes = require("./routes/taskRoutes");
+const userRoutes = require("./routes/userRoutes");
 
 const app = express();
 const PORT = process.env.PORT || 5050;
@@ -34,6 +36,7 @@ app.use("/api", authRoutes);
 app.use("/api", protectedRoutes);
 app.use("/api/admin", adminRoutes);
 app.use("/api", taskRoutes);
+app.use("/api/users", userRoutes);
 
 // Root endpoint
 app.get("/", (req, res) => {

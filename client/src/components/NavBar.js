@@ -22,13 +22,17 @@ function Navbar() {
 
           {role === "ADMIN" && (
             <>
-              <Link to="/admin-only" style={{ marginRight: "10px" }}>Admin</Link>
+              <Link to="/admin-only" style={{ marginRight: "10px" }}>Admin Dashboard</Link>
               <Link to="/audit-logs" style={{ marginRight: "10px" }}>Audit Logs</Link>
             </>
           )}
 
           {(role === "MANAGER" || role === "ADMIN") && (
-            <Link to="/manager-dashboard" style={{ marginRight: "10px" }}>Manager</Link>
+            <Link to="/manager-dashboard" style={{ marginRight: "10px" }}>Manager Dashboard</Link>
+          )}
+
+          {role === "CUSTOMER" && (
+            <Link to="/my-tasks" style={{ marginRight: "10px" }}>My Tasks</Link>
           )}
 
           <button onClick={handleLogout}>Logout</button>

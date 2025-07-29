@@ -8,6 +8,10 @@ import ChangePassword from "./pages/ChangePassword";
 import ForgotPassword from "./pages/ForgotPassword";
 import ResetPassword from "./pages/ResetPassword";
 import AuditLogs from "./pages/AuditLogs";
+import TaskList from "./components/TaskList";
+import MyTasks from "./pages/MyTasks";
+import TaskForm from "./components/TaskForm";
+
 import ProtectedRoute from "./components/ProtectedRoute";
 import Navbar from "./components/NavBar";
 
@@ -51,7 +55,7 @@ function App() {
         <Route
           path="/change-password"
           element={
-            <ProtectedRoute>
+            <ProtectedRoute allowedRoles={["ADMIN", "MANAGER", "CUSTOMER"]}>
               <ChangePassword />
             </ProtectedRoute>
           }
@@ -62,6 +66,33 @@ function App() {
           element={
             <ProtectedRoute allowedRoles={["ADMIN"]}>
               <AuditLogs />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/tasks"
+          element={
+            <ProtectedRoute allowedRoles={["ADMIN", "MANAGER"]}>
+              <TaskList />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/tasks/new"
+          element={
+            <ProtectedRoute allowedRoles={["ADMIN", "MANAGER"]}>
+              <TaskForm />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/my-tasks"
+          element={
+            <ProtectedRoute allowedRoles={["CUSTOMER"]}>
+              <MyTasks />
             </ProtectedRoute>
           }
         />
