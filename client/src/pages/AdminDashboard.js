@@ -2,6 +2,7 @@
 import React, { useEffect, useState } from "react";
 import api from "../services/api";
 import EditUserModal from "../components/EditUserModal";
+import CreateUserForm from "../components/CreateUserForm";
 
 function AdminDashboard() {
   const [users, setUsers] = useState([]);
@@ -30,7 +31,7 @@ function AdminDashboard() {
       {error && <p className="text-red-600">{error}</p>}
 
       {users.length === 0 && !error && <p>No users found.</p>}
-
+      <CreateUserForm onUserCreated={fetchAllUsers} />
       <h3>User List</h3>
       {users.length > 0 && (
         <table className="w-full border border-collapse mt-4" border="1" cellPadding="6">
