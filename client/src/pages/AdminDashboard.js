@@ -25,12 +25,13 @@ function AdminDashboard() {
 
   return (
     <div className="p-6">
-      <h2 className="text-2xl font-bold mb-4">Admin: All Users</h2>
+      <h2 className="text-2xl font-bold mb-4">Admin Dashboard</h2>
 
       {error && <p className="text-red-600">{error}</p>}
 
       {users.length === 0 && !error && <p>No users found.</p>}
 
+      <h3>User List</h3>
       {users.length > 0 && (
         <table className="w-full border border-collapse mt-4" border="1" cellPadding="6">
           <thead>
@@ -77,7 +78,7 @@ function AdminDashboard() {
         <EditUserModal
           user={editingUser}
           onClose={() => setEditingUser(null)}
-          onRefresh={fetchAllUsers} // pass refresh function
+          onRefresh={fetchAllUsers}
         />
       )}
     </div>
