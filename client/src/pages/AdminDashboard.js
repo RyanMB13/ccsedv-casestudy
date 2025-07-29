@@ -1,15 +1,17 @@
 import React, { useEffect, useState } from "react";
 import api from "../services/api";
+import EditUserModal from "../components/EditUserModal";
 
 function AdminDashboard() {
-  const [users, setUsers] = useState([]); 
+  const [users, setUsers] = useState([]);
   const [error, setError] = useState("");
+  const [editingUser, setEditingUser] = useState(null);
 
   useEffect(() => {
     const fetchAllUsers = async () => {
       try {
-        const res = await api.get("/admin/users"); // Ensure backend is correct
-        setUsers(res.data.users); // Make sure this is an array
+        const res = await api.get("/admin/users");
+        setUsers(res.data.users);
       } catch (err) {
         console.error("Failed to fetch users:", err);
         setError("Access denied or failed to load users.");
@@ -18,6 +20,13 @@ function AdminDashboard() {
 
     fetchAllUsers();
   }, []);
+
+  const handleSave = (updatedUser) => {
+    setUsers((prev) =>
+      prev.map((u) => (u.id === updatedUser.id ? updatedUser : u))
+    );
+    setEditingUser(null);
+  };
 
   return (
     <div className="p-6">
@@ -38,6 +47,7 @@ function AdminDashboard() {
               <th>Lockout Until</th>
               <th>Failed Attempts</th>
               <th>Password Changed At</th>
+              <th>Actions</th>
             </tr>
           </thead>
           <tbody>
@@ -51,10 +61,26 @@ function AdminDashboard() {
                 <td>{u.lockoutUntil ? new Date(u.lockoutUntil).toLocaleString() : "N/A"}</td>
                 <td>{u.failedLoginAttempts}</td>
                 <td>{u.passwordChangedAt ? new Date(u.passwordChangedAt).toLocaleString() : "N/A"}</td>
+                <td>
+                  <button
+                    className="bg-yellow-500 text-white px-2 py-1 rounded"
+                    onClick={() => setEditingUser(u)}
+                  >
+                    Edit
+                  </button>
+                </td>
               </tr>
             ))}
           </tbody>
         </table>
+      )}
+
+      {editingUser && (
+        <EditUserModal
+          user={editingUser}
+          onClose={() => setEditingUser(null)}
+          onSave={handleSave}
+        />
       )}
     </div>
   );

@@ -41,7 +41,7 @@ function Register() {
     if (!validate()) return;
 
     try {
-      await api.post("/register", {
+      await api.post("/auth/register", {
         email,
         password,
         role: "EMPLOYEE", // Force default role

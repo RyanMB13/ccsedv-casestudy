@@ -34,7 +34,7 @@ app.use(cookieParser());
 
 // Route Definitions
 app.use("/api/auth", authRoutes);           // Login, register, forgot/reset password
-app.use("/api", protectedRoutes);           // Profile, change password, shared protected routes
+app.use("/api", protectedRoutes);           // Profile, shared protected routes
 app.use("/api/admin", adminRoutes);         // Admin-only: audit logs, user management
 app.use("/api/tasks", taskRoutes);          // Task operations (create, get, update, delete)
 app.use("/api/users", userRoutes);          // Public or shared user operations (optional)

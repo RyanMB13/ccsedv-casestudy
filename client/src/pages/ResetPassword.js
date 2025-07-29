@@ -1,53 +1,83 @@
-// src/pages/ResetPassword.js
-import React, { useState } from "react";
-import { useSearchParams } from "react-router-dom";
+// pages/ResetPassword.js
+import { useParams, useNavigate } from "react-router-dom";
+import { useState } from "react";
 import api from "../services/api";
-import { isReasonablePasswordLength } from "../utils/validationHelpers";
 
 function ResetPassword() {
-  const [searchParams] = useSearchParams();
-  const token = searchParams.get("token");
-
+  const { token } = useParams();
   const [newPassword, setNewPassword] = useState("");
+  const [confirmNewPassword, setConfirmNewPassword] = useState("");
   const [error, setError] = useState("");
-  const [validationError, setValidationError] = useState("");
   const [success, setSuccess] = useState("");
+  const navigate = useNavigate();
 
-  const handleReset = async (e) => {
+  const validatePasswordComplexity = (password) =>
+    /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$/.test(password);
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
-    setValidationError("");
+    setSuccess("");
 
-    if (!isReasonablePasswordLength(newPassword)) {
-      setValidationError("Password must be between 8 and 128 characters.");
-      return;
+    if (newPassword !== confirmNewPassword) {
+      return setError("Passwords do not match.");
+    }
+
+    if (!validatePasswordComplexity(newPassword)) {
+      return setError(
+        "Password must include uppercase, lowercase, number, and special character."
+      );
     }
 
     try {
-      const res = await api.post("/reset-password", { token, newPassword });
+      const res = await api.post("/auth/reset-password", {
+        token,
+        newPassword,
+      });
       setSuccess(res.data.message);
+      setNewPassword("");
+      setConfirmNewPassword("");
+      setTimeout(() => navigate("/login"), 2000);
     } catch (err) {
-      setError(err.response?.data?.message || "Failed to reset password.");
+      setError(err.response?.data?.message || "Password reset failed.");
     }
   };
 
   return (
-    <form onSubmit={handleReset}>
-      <h2>Reset Password</h2>
+    <div>
+      <h2 className="text-xl font-bold mb-4">Reset Password</h2>
 
-      {validationError && <p style={{ color: "orange" }}>{validationError}</p>}
-      {error && <p style={{ color: "red" }}>{error}</p>}
-      {success && <p style={{ color: "green" }}>{success}</p>}
+      {error && <p className="text-red-600">{error}</p>}
+      {success && <p className="text-green-600">{success}</p>}
 
-      <label>New Password:</label>
-      <input
-        type="password"
-        required
-        value={newPassword}
-        onChange={(e) => setNewPassword(e.target.value)}
-      />
-      <button type="submit">Reset</button>
-    </form>
+      <form onSubmit={handleSubmit} className="space-y-4 max-w-md">
+        <div>
+          <label>New Password: </label>
+          <input
+            type="password"
+            required
+            value={newPassword}
+            onChange={(e) => setNewPassword(e.target.value)}
+            className="border w-full p-2"
+          />
+        </div>
+
+        <div>
+          <label>Confirm New Password: </label>
+          <input
+            type="password"
+            required
+            value={confirmNewPassword}
+            onChange={(e) => setConfirmNewPassword(e.target.value)}
+            className="border w-full p-2"
+          />
+        </div>
+
+        <button type="submit" className="bg-blue-600 text-white px-4 py-2 rounded">
+          Reset Password
+        </button>
+      </form>
+    </div>
   );
 }
 

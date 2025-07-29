@@ -1,4 +1,5 @@
 const bcrypt = require("bcryptjs");
+const crypto = require("crypto");
 const jwt = require("jsonwebtoken");
 const { PrismaClient } = require("@prisma/client");
 const logAudit = require("../utils/logAudit");
@@ -150,7 +151,7 @@ exports.loginUser = async (req, res) => {
 // POST /api/change-password
 // ===============================
 exports.changePassword = async (req, res) => {
-  const userId = req.user.userId;
+  const userId = req.user?.userId;
   const { currentPassword, newPassword } = req.body;
 
   try {
@@ -160,15 +161,17 @@ exports.changePassword = async (req, res) => {
       return res.status(404).json({ message: "User not found." });
     }
 
+    // Check current password
     const isMatch = await bcrypt.compare(currentPassword, user.password);
     if (!isMatch) {
       await logAudit({ userId, action: "CHANGE_PASSWORD_INVALID_CURRENT", req });
       return res.status(400).json({ message: "Current password is incorrect." });
     }
 
+    // Length & complexity check
     if (!isReasonablePasswordLength(newPassword)) {
       await logAudit({ userId, action: "CHANGE_PASSWORD_LENGTH_INVALID", req });
-      return res.status(400).json({ message: "Password must be between 8 and 64 characters." });
+      return res.status(400).json({ message: "Password must be between 8–64 characters." });
     }
 
     const complexityRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$/;
@@ -179,22 +182,46 @@ exports.changePassword = async (req, res) => {
       });
     }
 
-    const isSameAsOld = await bcrypt.compare(newPassword, user.password);
-    if (isSameAsOld) {
-      await logAudit({ userId, action: "CHANGE_PASSWORD_REUSE", req });
-      return res.status(400).json({ message: "You cannot reuse your previous password." });
+    // Prevent reusing same password
+    const isSameAsCurrent = await bcrypt.compare(newPassword, user.password);
+    if (isSameAsCurrent) {
+      await logAudit({ userId, action: "CHANGE_PASSWORD_REUSE_CURRENT", req });
+      return res.status(400).json({ message: "You cannot reuse your current password." });
+    }
+    
+    // Prevent changing password too frequently
+    const now = new Date();
+    const oneDayAgo = new Date(now.getTime() - 24 * 60 * 60 * 1000);
+
+    if (user.passwordChangedAt && user.passwordChangedAt > oneDayAgo) {
+      await logAudit({ userId, action: "CHANGE_PASSWORD_TOO_SOON", req });
+      return res.status(400).json({
+        message: "You can only change your password once every 24 hours.",
+      });
     }
 
-    const hashed = await bcrypt.hash(newPassword, 10);
-    await prisma.user.update({
-      where: { id: userId },
+    // Hash new password
+    const hashedNewPassword = await bcrypt.hash(newPassword, 10);
+
+    // Save to history
+    await prisma.passwordHistory.create({
       data: {
-        password: hashed,
+        userId: user.id,
+        hash: hashedNewPassword,
+      },
+    });
+
+    // Update user
+    await prisma.user.update({
+      where: { id: user.id },
+      data: {
+        password: hashedNewPassword,
+        passwordChangedAt: new Date(),
       },
     });
 
     await logAudit({ userId, action: "CHANGE_PASSWORD_SUCCESS", req });
-    res.status(200).json({ message: "Password changed successfully." });
+    res.json({ message: "Password changed successfully." });
   } catch (err) {
     console.error("Change password error:", err);
     await logAudit({ userId, action: "CHANGE_PASSWORD_ERROR", req });
@@ -209,29 +236,32 @@ exports.requestPasswordReset = async (req, res) => {
   const { email } = req.body;
 
   try {
-    if (!isValidEmail(email)) {
-      await logAudit({ action: "VALIDATION_FAIL_RESET_REQUEST_EMAIL", req });
-      return res.status(400).json({ message: "Invalid email format." });
-    }
-
     const user = await prisma.user.findUnique({ where: { email } });
-
     if (!user) {
       await logAudit({ action: "RESET_REQUEST_NO_USER", req });
-      return res.status(200).json({ message: "If the email exists, a reset link will be sent." });
+      return res.status(200).json({ message: "If that email is registered, a reset link has been sent." });
     }
 
-    const token = jwt.sign({ userId: user.id }, JWT_SECRET, { expiresIn: "15m" });
+    const token = crypto.randomBytes(32).toString("hex");
+    const hashedToken = crypto.createHash("sha256").update(token).digest("hex");
+    const expiresAt = new Date(Date.now() + 15 * 60 * 1000); // 15 minutes
 
-    console.log(`Reset link: http://localhost:3000/reset-password?token=${token}`);
+    await prisma.resetToken.create({
+      data: {
+        userId: user.id,
+        token: hashedToken,
+        expiresAt,
+      },
+    });
 
-    await logAudit({ userId: user.id, action: "REQUEST_PASSWORD_RESET", req });
+    console.log(`🔑 Reset link: http://localhost:3000/reset-password/${token}`);
 
-    res.status(200).json({ message: "If the email exists, a reset link will be sent." });
+    await logAudit({ userId: user.id, action: "RESET_REQUEST_SUCCESS", req });
+    res.status(200).json({ message: "If that email is registered, a reset link has been sent." });
   } catch (err) {
-    console.error("Password reset request error:", err);
+    console.error("Reset request error:", err);
     await logAudit({ action: "RESET_REQUEST_ERROR", req });
-    res.status(500).json({ message: "Server error while requesting reset." });
+    res.status(500).json({ message: "Error requesting password reset." });
   }
 };
 
@@ -242,45 +272,73 @@ exports.resetPassword = async (req, res) => {
   const { token, newPassword } = req.body;
 
   try {
-    if (!token) {
-      await logAudit({ action: "RESET_NO_TOKEN", req });
-      return res.status(400).json({ message: "Invalid or missing token" });
+    const hashedToken = crypto.createHash("sha256").update(token).digest("hex");
+    const tokenRecord = await prisma.resetToken.findFirst({
+      where: {
+        token: hashedToken,
+        expiresAt: { gt: new Date() },
+      },
+    });
+
+    if (!tokenRecord) {
+      return res.status(400).json({ message: "Invalid or expired token." });
+    }
+
+    const user = await prisma.user.findUnique({ where: { id: tokenRecord.userId } });
+    if (!user) {
+      return res.status(404).json({ message: "User not found." });
     }
 
     if (!isReasonablePasswordLength(newPassword)) {
-      await logAudit({ action: "RESET_FAIL_LENGTH", req });
-      return res.status(400).json({ message: "Password length must be between 8 and 64 characters." });
-    }
-
-    const decoded = jwt.verify(token, JWT_SECRET);
-    const user = await prisma.user.findUnique({ where: { id: decoded.userId } });
-
-    if (!user) {
-      await logAudit({ action: "RESET_USER_NOT_FOUND", req });
-      return res.status(404).json({ message: "User not found" });
+      return res.status(400).json({ message: "Password must be 8–64 characters." });
     }
 
     const complexityRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$/;
     if (!complexityRegex.test(newPassword)) {
-      await logAudit({ userId: user.id, action: "RESET_FAIL_COMPLEXITY", req });
       return res.status(400).json({
         message: "Password must include uppercase, lowercase, number, and special character.",
       });
+    }
+
+    const reused = await prisma.passwordHistory.findMany({
+      where: { userId: user.id },
+      take: 5,
+      orderBy: { createdAt: "desc" },
+    });
+
+    for (const past of reused) {
+      if (await bcrypt.compare(newPassword, past.hash)) {
+        return res.status(400).json({ message: "You cannot reuse a recent password." });
+      }
+    }
+
+    const now = new Date();
+    const oneDayAgo = new Date(now.getTime() - 24 * 60 * 60 * 1000);
+    if (user.passwordChangedAt && user.passwordChangedAt > oneDayAgo) {
+      return res.status(400).json({ message: "Password was recently changed. Try again after 24 hours." });
     }
 
     const hashed = await bcrypt.hash(newPassword, 10);
 
     await prisma.user.update({
       where: { id: user.id },
-      data: { password: hashed },
+      data: {
+        password: hashed,
+        passwordChangedAt: new Date(),
+      },
     });
 
-    await logAudit({ userId: user.id, action: "RESET_PASSWORD", req });
+    await prisma.passwordHistory.create({
+      data: { userId: user.id, hash: hashed },
+    });
 
-    res.status(200).json({ message: "Password reset successful" });
+    await prisma.resetToken.deleteMany({ where: { userId: user.id } });
+
+    await logAudit({ userId: user.id, action: "RESET_PASSWORD_SUCCESS", req });
+    res.json({ message: "Password reset successful." });
   } catch (err) {
     console.error("Reset password error:", err);
     await logAudit({ action: "RESET_PASSWORD_ERROR", req });
-    res.status(500).json({ message: "Error resetting password" });
+    res.status(500).json({ message: "Server error during password reset." });
   }
 };

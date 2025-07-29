@@ -51,51 +51,6 @@ router.get("/profile", verifyToken, async (req, res) => {
 });
 
 /**
- * POST /change-password
- * Allows authenticated users to change their password
- */
-router.post("/change-password", verifyToken, async (req, res) => {
-  const { currentPassword, newPassword } = req.body;
-  const userId = req.user.userId;
-
-  try {
-    const user = await prisma.user.findUnique({ where: { id: userId } });
-
-    if (!user) return res.status(404).json({ message: "User not found." });
-
-    const isMatch = await bcrypt.compare(currentPassword, user.password);
-    if (!isMatch) {
-      return res.status(401).json({ message: "Current password is incorrect." });
-    }
-
-    const isSame = await bcrypt.compare(newPassword, user.password);
-    if (isSame) {
-      return res.status(400).json({
-        message: "New password must be different from the current password.",
-      });
-    }
-
-    if (newPassword.length < 8) {
-      return res.status(400).json({
-        message: "New password must be at least 8 characters long.",
-      });
-    }
-
-    const hashedNewPassword = await bcrypt.hash(newPassword, await bcrypt.genSalt(10));
-
-    await prisma.user.update({
-      where: { id: userId },
-      data: { password: hashedNewPassword },
-    });
-
-    res.json({ message: "Password changed successfully." });
-  } catch (err) {
-    console.error("Change password error:", err);
-    res.status(500).json({ message: "Server error while changing password." });
-  }
-});
-
-/**
  * GET /audit-logs
  * Admin-only route to view audit logs
  */

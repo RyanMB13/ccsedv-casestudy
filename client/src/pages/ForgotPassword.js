@@ -1,48 +1,34 @@
-// src/pages/ForgotPassword.js
-import React, { useState } from "react";
+// ForgotPassword.js
+import { useState } from "react";
 import api from "../services/api";
-import { isValidEmail } from "../utils/validationHelpers";
 
 function ForgotPassword() {
   const [email, setEmail] = useState("");
   const [message, setMessage] = useState("");
-  const [validationError, setValidationError] = useState("");
-  const [error, setError] = useState("");
 
-  const handleSubmit = async (e) => {
+  const handleRequest = async (e) => {
     e.preventDefault();
-    setValidationError("");
-    setError("");
-
-    if (!isValidEmail(email)) {
-      setValidationError("Invalid email format.");
-      return;
-    }
-
     try {
-      const res = await api.post("/request-password-reset", { email });
+      const res = await api.post("/auth/request-password-reset", { email });
       setMessage(res.data.message);
     } catch (err) {
-      setError(err.response?.data?.message || "Failed to request password reset.");
+      setMessage(err.response?.data?.message || "Request failed.");
     }
   };
 
   return (
-    <form onSubmit={handleSubmit}>
+    <form onSubmit={handleRequest}>
       <h2>Forgot Password</h2>
-
-      {validationError && <p style={{ color: "orange" }}>{validationError}</p>}
-      {error && <p style={{ color: "red" }}>{error}</p>}
-      {message && <p style={{ color: "green" }}>{message}</p>}
-
-      <label>Email:</label>
       <input
         type="email"
         required
         value={email}
         onChange={(e) => setEmail(e.target.value)}
+        placeholder="Enter your email"
       />
+      <space>   </space>
       <button type="submit">Send Reset Link</button>
+      {message && <p>{message}</p>}
     </form>
   );
 }

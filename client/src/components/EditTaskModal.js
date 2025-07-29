@@ -32,10 +32,10 @@ function EditTaskModal({ task, onClose, onSave }) {
   return (
     <div className="fixed inset-0 bg-black bg-opacity-30 flex items-center justify-center z-50">
       <div className="bg-white p-6 rounded shadow w-full max-w-md">
-        <h2 className="text-xl font-bold mb-4">Edit Task</h2>
+        <h3 className="text-xl font-bold mb-4">Edit Task</h3>
         <form onSubmit={handleSubmit}>
           <div className="mb-3">
-            <label className="block text-sm font-semibold">Title</label>
+            <label className="block text-sm font-semibold">Title: </label>
             <input
               className="w-full border px-2 py-1 rounded"
               value={title}
@@ -45,7 +45,7 @@ function EditTaskModal({ task, onClose, onSave }) {
           </div>
 
           <div className="mb-3">
-            <label className="block text-sm font-semibold">Description</label>
+            <label className="block text-sm font-semibold">Description: </label>
             <textarea
               className="w-full border px-2 py-1 rounded"
               value={description}
@@ -55,7 +55,7 @@ function EditTaskModal({ task, onClose, onSave }) {
           </div>
 
           <div className="mb-3">
-            <label className="block text-sm font-semibold">Status</label>
+            <label className="block text-sm font-semibold">Status: </label>
             <select
               className="w-full border px-2 py-1 rounded"
               value={status}
@@ -67,7 +67,7 @@ function EditTaskModal({ task, onClose, onSave }) {
           </div>
 
           <div className="mb-3">
-            <label className="block text-sm font-semibold text-gray-600">Assigned To</label>
+            <label className="block text-sm font-semibold text-gray-600">Assigned To: </label>
             <input
               className="w-full border px-2 py-1 rounded bg-gray-100 text-sm"
               value={task?.assignedTo?.email || "Unassigned"}
@@ -77,7 +77,7 @@ function EditTaskModal({ task, onClose, onSave }) {
           </div>
 
           <div className="mb-4">
-            <label className="block text-sm font-semibold text-gray-600">Created By</label>
+            <label className="block text-sm font-semibold text-gray-600">Created By: </label>
             <input
               className="w-full border px-2 py-1 rounded bg-gray-100 text-sm"
               value={task?.createdBy?.email || "Unknown"}
