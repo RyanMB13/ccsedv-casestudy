@@ -3,18 +3,41 @@ const logAudit = require("../utils/logAudit");
 
 const prisma = new PrismaClient();
 
-// CREATE task
+// ===============================
+// CREATE Task
+// ===============================
 exports.createTask = async (req, res) => {
   const { title, description, assignedToId } = req.body;
   const creatorId = req.user.userId;
+  const role = req.user.role;
 
   try {
+    let finalAssignedToId = assignedToId;
+
+    if (role === "EMPLOYEE") {
+      finalAssignedToId = creatorId;
+    } else {
+      if (!assignedToId) {
+        return res.status(400).json({
+          message: "assignedToId is required for managers/admins.",
+        });
+      }
+
+      const userExists = await prisma.user.findUnique({
+        where: { id: Number(assignedToId) },
+      });
+
+      if (!userExists) {
+        return res.status(404).json({ message: "Assigned user not found" });
+      }
+    }
+
     const task = await prisma.task.create({
       data: {
         title,
         description,
         createdById: creatorId,
-        assignedToId: assignedToId || null,
+        assignedToId: Number(finalAssignedToId),
       },
     });
 
@@ -22,7 +45,11 @@ exports.createTask = async (req, res) => {
       userId: creatorId,
       action: "CREATE_TASK",
       req,
-      metadata: { taskId: task.id, title: task.title },
+      metadata: {
+        taskId: task.id,
+        title: task.title,
+        assignedToId: finalAssignedToId,
+      },
     });
 
     res.status(201).json(task);
@@ -32,7 +59,9 @@ exports.createTask = async (req, res) => {
   }
 };
 
-// GET all tasks (admin/manager)
+// ===============================
+// GET All Tasks (Admins/Managers)
+// ===============================
 exports.getAllTasks = async (req, res) => {
   try {
     const tasks = await prisma.task.findMany({
@@ -55,7 +84,9 @@ exports.getAllTasks = async (req, res) => {
   }
 };
 
-// GET own assigned tasks (employee)
+// ===============================
+// GET My Tasks (Employees)
+// ===============================
 exports.getMyTasks = async (req, res) => {
   const userId = req.user.userId;
 
@@ -77,22 +108,52 @@ exports.getMyTasks = async (req, res) => {
   }
 };
 
-// UPDATE task status
+// ===============================
+// UPDATE Task Status
+// ===============================
 exports.updateTask = async (req, res) => {
   const { id } = req.params;
-  const { status } = req.body;
+  const { status, title, description } = req.body;
 
   try {
+    const task = await prisma.task.findUnique({
+      where: { id: Number(id) },
+    });
+
+    if (!task) {
+      return res.status(404).json({ message: "Task not found" });
+    }
+
+    // EMPLOYEES can only update their own assigned tasks
+    if (
+      req.user.role === "EMPLOYEE" &&
+      task.assignedToId !== req.user.userId
+    ) {
+      return res.status(403).json({ message: "Unauthorized" });
+    }
+
     const updated = await prisma.task.update({
       where: { id: Number(id) },
-      data: { status },
+      data: {
+        ...(status && { status }),
+        ...(title && { title }),
+        ...(description && { description }),
+      },
+      include: {
+        assignedTo: true,
+        createdBy: true,
+      },
     });
 
     await logAudit({
       userId: req.user.userId,
       action: "UPDATE_TASK",
       req,
-      metadata: { taskId: id, newStatus: status },
+      metadata: {
+        taskId: id,
+        newStatus: updated.status,
+        updatedFields: { title, description },
+      },
     });
 
     res.json(updated);
@@ -102,7 +163,9 @@ exports.updateTask = async (req, res) => {
   }
 };
 
-// DELETE task
+// ===============================
+// DELETE Task
+// ===============================
 exports.deleteTask = async (req, res) => {
   const { id } = req.params;
 

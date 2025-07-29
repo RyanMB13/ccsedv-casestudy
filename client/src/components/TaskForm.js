@@ -9,34 +9,38 @@ function TaskForm({ onTaskCreated }) {
   const [users, setUsers] = useState([]);
   const [error, setError] = useState("");
 
-  useEffect(() => {
-    async function fetchUsers() {
-      try {
-        const res = await api.get("/users"); // Must be protected by auth
-        setUsers(res.data);
-      } catch (err) {
-        console.error("Failed to fetch users:", err);
-        setError("Could not load users");
-      }
-    }
+  const role = localStorage.getItem("role");
 
-    fetchUsers();
-  }, []);
+  useEffect(() => {
+    // Only fetch users if manager/admin
+    if (role === "ADMIN" || role === "MANAGER") {
+      async function fetchUsers() {
+        try {
+          const res = await api.get("/users");
+          setUsers(res.data);
+        } catch (err) {
+          console.error("Failed to fetch users:", err);
+          setError("Could not load users");
+        }
+      }
+      fetchUsers();
+    }
+  }, [role]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
       await api.post("/tasks", {
-        title,
-        description,
-        assignedToId: assignedToId || null, // null for unassigned
-      });
+      title,
+      description,
+      ...(role !== "EMPLOYEE" && assignedToId ? { assignedToId } : {}),
+    });
 
       setTitle("");
       setDescription("");
       setAssignedToId("");
       setError("");
-      onTaskCreated(); // Refresh task list
+      onTaskCreated();
     } catch (err) {
       console.error("Error creating task:", err);
       setError("Failed to create task.");
@@ -69,18 +73,20 @@ function TaskForm({ onTaskCreated }) {
         className="w-full border p-2 rounded"
       />
 
-      <select
-        value={assignedToId}
-        onChange={(e) => setAssignedToId(e.target.value)}
-        className="w-full border p-2 rounded"
-      >
-        <option value="">-- Assign to... --</option>
-        {users.map((user) => (
-          <option key={user.id} value={user.id}>
-            {user.email} ({user.role})
-          </option>
-        ))}
-      </select>
+      {role !== "EMPLOYEE" && (
+        <select
+          value={assignedToId}
+          onChange={(e) => setAssignedToId(e.target.value)}
+          className="w-full border p-2 rounded"
+        >
+          <option value="">-- Assign to... --</option>
+          {users.map((user) => (
+            <option key={user.id} value={user.id}>
+              {user.email} ({user.role})
+            </option>
+          ))}
+        </select>
+      )}
 
       <button type="submit" className="bg-blue-600 text-white px-4 py-2 rounded">
         Create Task

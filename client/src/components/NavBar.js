@@ -22,7 +22,7 @@ function Navbar() {
 
           {role === "ADMIN" && (
             <>
-              <Link to="/admin-only" style={{ marginRight: "10px" }}>Admin Dashboard</Link>
+              <Link to="/admin-dashboard" style={{ marginRight: "10px" }}>Admin Dashboard</Link>
               <Link to="/audit-logs" style={{ marginRight: "10px" }}>Audit Logs</Link>
             </>
           )}
@@ -32,7 +32,10 @@ function Navbar() {
           )}
 
           {role === "EMPLOYEE" && (
-            <Link to="/my-tasks" style={{ marginRight: "10px" }}>My Tasks</Link>
+            <>
+              <Link to="/employee/create-task" style={{ marginRight: "10px" }}>Create Task</Link>
+              <Link to="/my-tasks" style={{ marginRight: "10px" }}>My Tasks</Link>
+            </>
           )}
 
           <button onClick={handleLogout}>Logout</button>

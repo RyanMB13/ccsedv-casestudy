@@ -1,4 +1,4 @@
-//server/app.js
+// server/app.js
 const express = require("express");
 const cors = require("cors");
 const helmet = require("helmet");
@@ -16,9 +16,10 @@ const userRoutes = require("./routes/userRoutes");
 const app = express();
 const PORT = process.env.PORT || 5050;
 
+// CORS Configuration
 const corsOptions = {
   origin: "http://localhost:3000",
-  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+  methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
   allowedHeaders: ["Content-Type", "Authorization"],
   credentials: true,
   optionsSuccessStatus: 204,
@@ -31,18 +32,19 @@ app.use(helmet());
 app.use(express.json());
 app.use(cookieParser());
 
-// Routes
-app.use("/api", authRoutes);
-app.use("/api", protectedRoutes);
-app.use("/api/admin", adminRoutes);
-app.use("/api", taskRoutes);
-app.use("/api/users", userRoutes);
+// Route Definitions
+app.use("/api/auth", authRoutes);           // Login, register, forgot/reset password
+app.use("/api", protectedRoutes);           // Profile, change password, shared protected routes
+app.use("/api/admin", adminRoutes);         // Admin-only: audit logs, user management
+app.use("/api/tasks", taskRoutes);          // Task operations (create, get, update, delete)
+app.use("/api/users", userRoutes);          // Public or shared user operations (optional)
 
 // Root endpoint
 app.get("/", (req, res) => {
   res.send("Secure Web App Backend");
 });
 
+// Server start
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
