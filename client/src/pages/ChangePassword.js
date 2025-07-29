@@ -1,4 +1,3 @@
-// pages/ChangePassword.js
 import React, { useState } from "react";
 import api from "../services/api";
 import { useNavigate } from "react-router-dom";
@@ -45,51 +44,55 @@ function ChangePassword() {
   };
 
   return (
-    <div>
-      <h2 className="text-xl font-bold mb-4">Change Password</h2>
+    <form
+      onSubmit={handleSubmit}
+      className="max-w-sm mx-auto mt-10 p-4 border rounded shadow bg-white space-y-4"
+    >
+      <h2 className="text-xl font-bold text-center mb-2">Change Password</h2>
 
-      {error && <p className="text-red-600">{error}</p>}
-      {success && <p className="text-green-600">{success}</p>}
+      {error && <p className="text-red-600 text-sm">{error}</p>}
+      {success && <p className="text-green-600 text-sm">{success}</p>}
 
-      <form onSubmit={handleSubmit} className="space-y-4 max-w-md">
-        <div>
-          <label>Current Password:</label>
-          <input
-            type="password"
-            required
-            value={currentPassword}
-            onChange={(e) => setCurrentPassword(e.target.value)}
-            className="border w-full p-2"
-          />
-        </div>
+      <div>
+        <label className="block mb-1">Current Password:</label>
+        <input
+          type="password"
+          required
+          value={currentPassword}
+          onChange={(e) => setCurrentPassword(e.target.value)}
+          className="w-full px-3 py-2 border rounded"
+        />
+      </div>
 
-        <div>
-          <label>New Password:</label>
-          <input
-            type="password"
-            required
-            value={newPassword}
-            onChange={(e) => setNewPassword(e.target.value)}
-            className="border w-full p-2"
-          />
-        </div>
+      <div>
+        <label className="block mb-1">New Password:</label>
+        <input
+          type="password"
+          required
+          value={newPassword}
+          onChange={(e) => setNewPassword(e.target.value)}
+          className="w-full px-3 py-2 border rounded"
+        />
+      </div>
 
-        <div>
-          <label>Confirm New Password:</label>
-          <input
-            type="password"
-            required
-            value={confirmNewPassword}
-            onChange={(e) => setConfirmNewPassword(e.target.value)}
-            className="border w-full p-2"
-          />
-        </div>
+      <div>
+        <label className="block mb-1">Confirm New Password:</label>
+        <input
+          type="password"
+          required
+          value={confirmNewPassword}
+          onChange={(e) => setConfirmNewPassword(e.target.value)}
+          className="w-full px-3 py-2 border rounded"
+        />
+      </div>
 
-        <button type="submit" className="bg-blue-600 text-white px-4 py-2 rounded">
-          Change Password
-        </button>
-      </form>
-    </div>
+      <button
+        type="submit"
+        className="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700"
+      >
+        Change Password
+      </button>
+    </form>
   );
 }
 
