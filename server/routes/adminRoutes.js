@@ -137,7 +137,7 @@ router.patch("/update-role/:userId", verifyToken, requireRole("ADMIN"), async (r
   const { userId } = req.params;
   const { newRole } = req.body;
 
-  if (!["ADMIN", "MANAGER"].includes(newRole)) {
+  if (!["ADMIN", "MANAGER", "EMPLOYEE"].includes(newRole)) {
     return res.status(400).json({ message: "Invalid role specified" });
   }
 
