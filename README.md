@@ -39,9 +39,9 @@ This is a secure web application built as a final case study for the CSSECDV (Se
    npx prisma db seed
     ```
    This will create:
-	•	"admin@admin.com" with password "Admin123!" as ADMIN
-	•	"manager@manager.com" with password "Manager123!" as MANAGER
-	•	"employee@employee.com" with password "Employee123!" as EMPLOYEE
+	- "admin@admin.com" with password "Admin123!" as ADMIN
+	- "manager@manager.com" with password "Manager123!" as MANAGER
+	- "employee@employee.com" with password "Employee123!" as EMPLOYEE
 
 6. Start the backend server:
    ```bash
