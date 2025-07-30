@@ -24,9 +24,7 @@ This is a secure web application built as a final case study for the CSSECDV (Se
 
 3. Create a `.env` file in `/server`:
    ```
-   DATABASE_URL="postgresql://<username>:<password>@localhost:5432/<database>?schema=public"
-   JWT_SECRET=supersecret
-   PORT=5050
+   DATABASE_URL="postgresql://postgres:secret123@localhost:5432/cssecdv_db?schema=public"
    ```
 
 4. Initialize the database:
