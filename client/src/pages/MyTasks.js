@@ -34,7 +34,7 @@ function MyTasks() {
 
   return (
     <div className="p-6">
-      <h2 className="text-2xl font-bold mb-6">🗒️ My Tasks</h2>
+      <h2 className="text-3xl font-bold mb-6">🗒️ My Tasks</h2>
 
       {error && <p className="text-red-600 font-semibold mb-4">{error}</p>}
       {!error && tasks.length === 0 && (

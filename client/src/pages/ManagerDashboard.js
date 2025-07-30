@@ -11,7 +11,7 @@ function ManagerDashboard() {
   return (
     <div className="p-6 bg-gray-50 min-h-screen">
       <div className="">
-        <h2 className="text-3xl font-bold text-blue-800 mb-6">📋 Manager Dashboard</h2>
+        <h2 className="text-3xl font-bold mb-6">📋 Manager Dashboard</h2>
 
         <div className="bg-white rounded shadow p-4 mb-6">
           <h3 className="text-xl font-semibold mb-3 text-gray-700">➕ Create New Task</h3>
