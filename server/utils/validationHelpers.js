@@ -4,7 +4,7 @@ function isValidEmail(email) {
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   return typeof email === "string" && email.length <= 100 && emailRegex.test(email);
 }
-
+//2.1.6
 function isReasonablePasswordLength(password) {
   return typeof password === "string" && password.length >= 8 && password.length <= 128;
 }

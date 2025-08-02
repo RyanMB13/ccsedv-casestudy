@@ -14,7 +14,7 @@ function isStrongPassword(password) {
   const strongRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_])/;
   return strongRegex.test(password);
 }
-
+//2.3.2 - 2.3.3
 module.exports = {
   isValidEmail,
   isReasonablePasswordLength,

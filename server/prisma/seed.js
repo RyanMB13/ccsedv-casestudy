@@ -4,6 +4,7 @@ const bcrypt = require('bcryptjs');
 
 const prisma = new PrismaClient();
 
+//1.1.1 - 1.1.2 - 1.1.3
 async function main() {
   const users = [
     {

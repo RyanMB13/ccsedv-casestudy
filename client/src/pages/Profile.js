@@ -48,7 +48,7 @@ function Profile() {
                 <td className="px-4 py-2">{user.role}</td>
                 <td className="px-4 py-2">
                   {user.lastLogin ? new Date(user.lastLogin).toLocaleString() : "N/A"}
-                </td>
+                </td> {/* 2.1.12*/}
                 <td className="px-4 py-2">
                   {user.previousLogin ? new Date(user.previousLogin).toLocaleString() : "N/A"}
                 </td>

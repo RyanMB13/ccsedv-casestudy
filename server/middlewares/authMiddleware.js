@@ -1,5 +1,6 @@
 // middlewares/authMiddleware.js
 
+//2.1.1
 // Ensure user is authenticated (assumes verifyToken already ran)
 function requireAuth(req, res, next) {
   if (!req.user) {

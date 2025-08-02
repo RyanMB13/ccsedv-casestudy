@@ -8,6 +8,8 @@ const { isValidEmail, isReasonablePasswordLength } = require("../../client/src/u
 const prisma = new PrismaClient();
 const JWT_SECRET = process.env.JWT_SECRET || "supersecret";
 
+//2.1.2
+
 // ===============================
 // POST /api/register
 // ===============================
@@ -30,7 +32,7 @@ exports.registerUser = async (req, res) => {
       await logAudit({ action: "REGISTER_EMAIL_EXISTS", req });
       return res.status(400).json({ message: "User already exists." });
     }
-
+    //2.1.5 
     const complexityRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$/;
     if (!complexityRegex.test(password)) {
       await logAudit({ action: "VALIDATION_FAIL_REGISTER_COMPLEXITY", req });
@@ -42,6 +44,7 @@ exports.registerUser = async (req, res) => {
     // Enforce default role
     const role = "EMPLOYEE";
 
+    //2.1.3
     const hashedPassword = await bcrypt.hash(password, await bcrypt.genSalt(10));
 
     const user = await prisma.user.create({
@@ -85,7 +88,7 @@ exports.loginUser = async (req, res) => {
       await logAudit({ action: "VALIDATION_FAIL_LOGIN_LENGTH", req });
       return res.status(400).json({ message: "Password length must be between 8 and 64 characters." });
     }
-
+    //2.1.4
     const user = await prisma.user.findUnique({ where: { email } });
     if (!user) {
       await logAudit({ action: "LOGIN_FAILED_NO_USER", req });
@@ -96,7 +99,7 @@ exports.loginUser = async (req, res) => {
       await logAudit({ userId: user.id, action: "LOGIN_LOCKED", req });
       return res.status(403).json({ message: "Account is temporarily locked. Please try again later." });
     }
-
+    //2.1.8
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
       const updatedUser = await prisma.user.update({
@@ -109,7 +112,7 @@ exports.loginUser = async (req, res) => {
               : undefined,
         },
       });
-
+      //2.1.4
       const lockMsg = updatedUser.failedLoginAttempts >= 5 ? " Account locked for 5 minutes." : "";
       await logAudit({ userId: user.id, action: "LOGIN_FAILED_PASSWORD", req });
       return res.status(401).json({ message: "Invalid email and/or password." + lockMsg });
@@ -133,7 +136,7 @@ exports.loginUser = async (req, res) => {
     );
 
     await logAudit({ userId: user.id, action: "LOGIN_SUCCESS", req });
-
+    
     res.status(200).json({
       message: "Login successful",
       token,
@@ -229,6 +232,8 @@ exports.changePassword = async (req, res) => {
   }
 };
 
+
+
 // ===============================
 // POST /api/request-password-reset
 // ===============================
@@ -264,7 +269,7 @@ exports.requestPasswordReset = async (req, res) => {
     res.status(500).json({ message: "Error requesting password reset." });
   }
 };
-
+//2.1.9
 // ===============================
 // POST /api/reset-password
 // ===============================
@@ -305,13 +310,13 @@ exports.resetPassword = async (req, res) => {
       take: 5,
       orderBy: { createdAt: "desc" },
     });
-
+    //2.1.10
     for (const past of reused) {
       if (await bcrypt.compare(newPassword, past.hash)) {
         return res.status(400).json({ message: "You cannot reuse a recent password." });
       }
     }
-
+    //2.1.11
     const now = new Date();
     const oneDayAgo = new Date(now.getTime() - 24 * 60 * 60 * 1000);
     if (user.passwordChangedAt && user.passwordChangedAt > oneDayAgo) {
